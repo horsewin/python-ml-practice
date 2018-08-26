@@ -6,6 +6,7 @@ from sklearn.datasets import load_iris, load_breast_cancer, load_boston, make_mo
 from sklearn.model_selection import train_test_split
 from sklearn.tree import DecisionTreeClassifier, DecisionTreeRegressor, export_graphviz
 from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
+from sklearn.svm import SVC
 
 def DesicionTree():
     cancer = load_breast_cancer()
@@ -62,10 +63,36 @@ def GradientBoosting():
         train_test_split(cancer.data, cancer.target, stratify=cancer.target, random_state=0)
     gbrt = GradientBoostingClassifier(random_state=0)
     gbrt.fit(X_train, y_train)
-    
     print("Accuracy on training set:{}".format(gbrt.score(X_train, y_train)))
     print("Accuracy on test set:{}".format(gbrt.score(X_test, y_test)))
 
-GradientBoosting()
+    gbrt = GradientBoostingClassifier(random_state=0, max_depth=1)
+    gbrt.fit(X_train, y_train)
+    print("Accuracy on training set:{}".format(gbrt.score(X_train, y_train)))
+    print("Accuracy on test set:{}".format(gbrt.score(X_test, y_test)))
+
+
+def SVM():
+    X, y = mglearn.tools.make_handcrafted_dataset()
+    svm = SVC(C=10, kernel='rbf', gamma=0.1).fit(X, y)
+    mglearn.plots.plot_2d_separator(svm, X, eps=.5)
+    mglearn.discrete_scatter(X[:, 0], X[:, 1], y)
+
+    sv = svm.support_vectors_
+    sv_labels = svm.dual_coef_.ravel() > 0
+    mglearn.discrete_scatter(sv[:, 0], sv[:, 1], sv_labels, s=15, markeredgewidth=3)
+    plt.xlabel("Feature 0")
+    plt.ylabel("Feature 1")
+
+
+def PlotSVMKernel():
+    fix, axes = plt.subplots(3, 3, figsize=(15, 10))
+    for ax, C in zip(axes, [-1, 0, 3]):
+        for a, gamma in zip(ax, range(-1, 2)):
+            mglearn.plots.plot_svm(log_C=C, log_gamma=gamma, ax=a)
+    axes[0, 0].legend(["class0", "class1", "sv class 0", "sv class 1"], ncol=4, loc='best')
+
+
+PlotSVMKernel()
 plt.show()
 
