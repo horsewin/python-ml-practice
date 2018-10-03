@@ -1,5 +1,8 @@
-# -*- coding: utf-8 -*-
-import numpy as np
+# coding: utf-8
+import sys
+sys.path.append('..')
+import os
+from common.np import *
 
 
 def preprocess(text):
