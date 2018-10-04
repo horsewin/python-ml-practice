@@ -15,4 +15,42 @@ class RNN:
         self.cache = (x, h_prev, h_next)
         return h_next
 
-    def backward(self, dh_prev):
+    def backward(self, dh_next):
+        Wx, Wh, b = self.params
+        x, h_prev, h_next = self.cache
+
+        dt = dh_next * (1 - h_next ** 2)
+        db = np.sum(dt, axis=0)
+
+        dWh = np.dot(h_prev.T, dt)
+        dh_prev = np.dot(dt, Wh.T)
+        dWx = np.dot(x.T, dt)
+        dx = np.dot(dt, Wx.T)
+
+        self.grads[0][...] = dWx
+        self.grads[1][...] = dWh
+        self.grads[2][...] = db
+
+        return dx, dh_prev
+
+
+class TimeRNN:
+    def __init__(self, Wx, Wh, b, stateful=False):
+        self.params = [Wx, Wh, b]
+        self.grads = [
+            np.zeros_like(Wx),
+            np.zeros_like(Wh),
+            np.zeros_like(b)
+        ]
+        self.layer = None
+
+        self.h, self.dh = None, None
+        self.stateful = stateful
+
+    def set_state(self, h):
+        self.h = h
+
+    def reset_state(self):
+        self.h = None
+
+#    def forward(self, ):
